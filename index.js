@@ -48,9 +48,9 @@ module.exports = params => {
                 return Promise.reject(err);
             }
             // Auth successful, but continue after receiving packet index
-            return connection.getData(dataHandler).then(() => {
+           // return connection.getData(dataHandler).then(() => {
                 _init(connection);
-            });
+           // });
         });
 
         function dataHandler() {
@@ -84,21 +84,22 @@ module.exports = params => {
                     type: packet.SERVERDATA_EXECCOMMAND,
                     body: text
                 });
-                let ackId = _getNextPacketId();
-                let ack = packet.request({
-                    id: ackId,
-                    type: packet.SERVERDATA_EXECCOMMAND,
-                    body: ''
-                });
+              //  let ackId = _getNextPacketId();
+             //   let ack = packet.request({
+            //        id: ackId,
+             //       type: packet.SERVERDATA_EXECCOMMAND,
+               //     body: ''
+               // });
                 _connection.send(req);
-                _connection.send(ack);
+               // _connection.send(ack);
                 _connection.getData(dataHandler).then(done);
 
                 function dataHandler(data) {
                     let res = packet.response(data);
-                    if (res.id === ackId) {
-                        return false;
-                    } else if (res.id === reqId) {
+                  //  if (res.id === ackId) {
+                  //      return false;
+                  //  } else 
+                    if (res.id === reqId) {
                         // More data to come
                         responseData = Buffer.concat([responseData, res.payload], responseData.length + res.payload.length);
                         return true;
