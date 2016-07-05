@@ -39,7 +39,7 @@ module.exports = params => {
                 let err = new Error('Auth timeout');
                 return Promise.reject(err);
             }),
-            connection.getData(dataHandler)
+            connection.getData(false)
         ]).then(data => {
             // TODO: data as a single type, not string/object
             let res = packet.response(data);
@@ -47,16 +47,17 @@ module.exports = params => {
                 let err = new Error('Wrong rcon password');
                 return Promise.reject(err);
             }
+
             // Auth successful, but continue after receiving packet index
-           // return connection.getData(dataHandler).then(() => {
+        //    return connection.getData(false).then(() => {
                 _init(connection);
-           // });
+        //    });
         });
 
-        function dataHandler() {
-            // Auth response should only return 1 packet
-            return false;
-        }
+        // function dataHandler() {
+        //     // Auth response should only return 1 packet
+        //     return false;
+        // }
     }
 
     function _init(connection) {
@@ -84,21 +85,21 @@ module.exports = params => {
                     type: packet.SERVERDATA_EXECCOMMAND,
                     body: text
                 });
-              //  let ackId = _getNextPacketId();
-             //   let ack = packet.request({
-            //        id: ackId,
-             //       type: packet.SERVERDATA_EXECCOMMAND,
-               //     body: ''
-               // });
+               let ackId = _getNextPacketId();
+               let ack = packet.request({
+                   id: ackId,
+                   type: packet.SERVERDATA_EXECCOMMAND,
+                   body: ''
+               });
                 _connection.send(req);
-               // _connection.send(ack);
+               _connection.send(ack);
                 _connection.getData(dataHandler).then(done);
 
                 function dataHandler(data) {
                     let res = packet.response(data);
-                  //  if (res.id === ackId) {
-                  //      return false;
-                  //  } else 
+                   if (res.id === ackId) {
+                       return false;
+                   } else
                     if (res.id === reqId) {
                         // More data to come
                         responseData = Buffer.concat([responseData, res.payload], responseData.length + res.payload.length);
