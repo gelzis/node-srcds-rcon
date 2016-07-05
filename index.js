@@ -43,21 +43,21 @@ module.exports = params => {
         ]).then(data => {
             // TODO: data as a single type, not string/object
             let res = packet.response(data);
-            if (res.id === -1) {
+            if (res.id === -1 || res.type !== packet.SERVERDATA_AUTH_RESPONSE) {
                 let err = new Error('Wrong rcon password');
                 return Promise.reject(err);
             }
 
-            // Auth successful, but continue after receiving packet index
-        //    return connection.getData(false).then(() => {
-                _init(connection);
-        //    });
+			if(res.type === packet.SERVERDATA_RESPONSE_VALUE) {
+				// Auth successful, but continue after receiving packet index
+				   return connection.getData(false).then(() => {
+						_init(connection);
+				   });
+			} else {
+				return _init(connection);
+			}
         });
 
-        // function dataHandler() {
-        //     // Auth response should only return 1 packet
-        //     return false;
-        // }
     }
 
     function _init(connection) {
