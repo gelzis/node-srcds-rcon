@@ -43,12 +43,12 @@ module.exports = params => {
         ]).then(data => {
             // TODO: data as a single type, not string/object
             let res = packet.response(data);
-            if (res.id === -1 || res.type !== packet.SERVERDATA_AUTH_RESPONSE) {
+            if (res.id === -1) {
                 let err = new Error('Wrong rcon password');
                 return Promise.reject(err);
             }
 
-			if(res.type === packet.SERVERDATA_RESPONSE_VALUE) {
+			if(res.type === packet.SERVERDATA_RESPONSE_VALUE && !res.payload.length) {
 				// Auth successful, but continue after receiving packet index
 				   return connection.getData(false).then(() => {
 						_init(connection);
